@@ -1,81 +1,189 @@
 # Calendário Villains
 
-Calendário público e painel de administração da fraternidade Villains (GTA V RP / FiveM).
+Sistema web de gerenciamento e visualização de eventos desenvolvido para a **Villains**, uma fraternidade do universo de GTA V Roleplay (FiveM).
 
-## Tecnologias
+O projeto tem como objetivo centralizar a programação da fraternidade em uma plataforma moderna, intuitiva e acessível, permitindo que membros e visitantes acompanhem reuniões, estudos, recrutamentos, aniversários e outros acontecimentos importantes.
 
-React + Vite, Firebase Authentication, Cloud Firestore e deploy na Vercel.
-
-## Executar localmente
-
-1. Instale Node.js 20.19+ ou 22+.
-2. Execute `npm install`.
-3. Copie `.env.example` para `.env` e preencha as variáveis do Firebase.
-4. Execute `npm run dev`.
-5. Abra o endereço mostrado pelo Vite.
-
-Sem Firebase configurado, o site abre com calendário vazio, mas não permite salvar eventos ou entrar como administrador.
-
-## Configurar Firebase
-
-1. Crie um projeto no console Firebase.
-2. Ative **Authentication > Sign-in method > Email/Password**.
-3. Crie um usuário administrativo em **Authentication > Users**.
-4. Crie um banco **Cloud Firestore**.
-5. Publique as regras de `firestore.rules` no console ou com `firebase deploy --only firestore:rules` (requer Firebase CLI e projeto selecionado).
-6. No Firestore, crie a coleção `admins` e um documento com ID **exatamente igual ao UID do usuário criado**. O conteúdo pode ser `{ "role": "admin" }`. A coleção `admins` não permite escrita pelo cliente, para evitar autopromoção de privilégios.
-7. Acesse `/login`, entre com o e-mail e a senha criados, abra `/admin` e clique em **Categorias > Cadastrar categorias iniciais ausentes**.
-
-Não compartilhe suas credenciais nem coloque chaves privadas de serviço no frontend. As variáveis `VITE_FIREBASE_*` são configuração pública do aplicativo; a proteção dos dados depende das regras do Firestore.
-
-## Deploy na Vercel
-
-1. Envie a pasta do projeto para um repositório Git.
-2. Importe o repositório na Vercel, com framework **Vite**.
-3. Configure as mesmas variáveis `VITE_FIREBASE_*` no projeto da Vercel.
-4. Faça o deploy. O arquivo `vercel.json` permite abrir `/login` e `/admin` diretamente.
-5. No Firebase Authentication, inclua o domínio da Vercel em **Authorized domains** se necessário.
-
-## Estrutura
-
-- `src/components/`: peças reutilizáveis da interface.
-- `src/contexts/`: autenticação e dados compartilhados.
-- `src/pages/`: calendário público, login e administração.
-- `src/services/`: configuração e operações Firebase.
-- `src/utils/`: funções de data e status.
-- `src/styles/`: estilo global.
-- `public/`: logos oficiais fornecidas.
-
-## Modelo de dados
-
-`categories`: `{ name, color }`.
-
-`events`: `{ title, description, categoryId, startDate, endDate, startTime, endTime, allDay, status }`.
-
-Datas usam `YYYY-MM-DD`; horários usam `HH:mm` no fuso de Brasília. `status` aceita `scheduled`, `completed` ou `cancelled`.
+A aplicação oferece um calendário público, sem necessidade de autenticação, e um painel administrativo exclusivo para usuários autorizados.
 
 ## Funcionalidades
 
-- Leitura pública, sem login, em modos Mês e Lista.
-- Filtro por categoria, eventos do mês e detalhes ao passar o mouse.
-- Modal de evento e link para adicionar ao Google Agenda.
-- Administração restrita por autenticação e documento `admins/{uid}`.
-- Criar, editar e excluir eventos e categorias.
-- Calendário compacto e busca no painel administrativo.
+### Calendário público
 
-## Observações
+- Visualização de eventos nos formatos **Mês** e **Lista**.
+- Navegação entre meses e datas.
+- Filtragem de eventos por categorias.
+- Identificação visual das categorias por cores.
+- Exibição de detalhes ao passar o mouse sobre os dias.
+- Modal com informações completas dos eventos.
+- Integração para adicionar eventos ao Google Agenda.
+- Identificação visual de eventos cujo horário de início já passou.
+- Interface responsiva para computadores e dispositivos móveis.
+- Acesso público, sem necessidade de cadastro ou login.
 
-- A lista inicial de categorias é cadastrada pelo administrador para evitar escrita pública no banco.
-- Não há dados fictícios inseridos na base de produção.
-- Exclusão de categoria com eventos vinculados é bloqueada pela interface; em produção, para consistência sob concorrência, considere reforçar essa regra por backend confiável.
-- O link do Google Agenda usa o fuso `America/Sao_Paulo`.
+### Painel administrativo
 
-## Autenticação por ID e administradores (atualização)
+Área restrita aos administradores da fraternidade, destinada ao gerenciamento do calendário.
 
-- O login usa um ID numérico, convertido internamente em e-mail técnico (`ID@admins.villains.invalid`) para o Firebase Authentication. O usuário nunca precisa digitar e-mail.
-- Para iniciar a conta principal, instale `firebase-admin` localmente (`npm install --no-save firebase-admin`) e configure `GOOGLE_APPLICATION_CREDENTIALS` com o caminho absoluto de uma chave de conta de serviço do seu projeto Firebase, além de `VILLAINS_INITIAL_PASSWORD` com a senha inicial desejada. Execute `node scripts/bootstrap-admin.cjs` na raiz do projeto. **Não inclua a chave nem a senha no repositório ou na Vercel.**
-- Para que administradores possam cadastrar, editar e excluir outros administradores, instale as dependências de `functions/` e implante as Cloud Functions com `firebase deploy --only functions` (é necessário um plano Firebase compatível com Cloud Functions). Implante também as regras atualizadas: `firebase deploy --only firestore:rules`.
-- Ative o provedor **E-mail/senha** no Firebase Authentication. As contas são criadas exclusivamente no backend com Firebase Admin SDK. Não há cadastro público de administradores.
-- Senhas têm mínimo de **6 caracteres**, exigência mínima do Firebase Authentication. Não exigimos maiúsculas ou caracteres especiais.
-- Novos administradores recebem uma modal opcional de mudança de senha no primeiro acesso. O botão “Agora não” encerra a apresentação da modal sem alterar a senha.
-- O login não estará disponível até a configuração do Firebase. Nenhuma credencial real está incluída no código-fonte.
+**Gerenciamento de eventos**
+- Cadastro de novos eventos.
+- Edição de informações e horários.
+- Exclusão de eventos.
+- Organização por categorias e datas.
+- Visualização dos eventos cadastrados.
+
+**Gerenciamento de categorias**
+- Cadastro de novas categorias.
+- Edição de nomes e cores.
+- Exclusão de categorias.
+- Atualização das categorias exibidas no calendário público.
+
+**Gerenciamento de administradores**
+- Autenticação por ID e senha.
+- Cadastro de administradores por usuários autorizados.
+- Gerenciamento de contas administrativas.
+- Senha provisória para novos administradores.
+- Opção de alteração de senha no primeiro acesso.
+- Controle de permissões para operações administrativas.
+
+## Categorias iniciais
+
+O sistema conta com oito categorias predefinidas:
+
+- Reunião
+- Estudo Villains
+- Lore Interna
+- Recrutamento
+- Evento Interno
+- Aniversário
+- Evento Fraternidades
+- Evento Cidade
+
+As categorias são armazenadas no Firebase Firestore e podem ser gerenciadas pelo painel administrativo.
+
+## Tecnologias utilizadas
+
+| Tecnologia | Utilização |
+|---|---|
+| React.js | Desenvolvimento da interface |
+| Vite | Ambiente de desenvolvimento e build |
+| JavaScript | Lógica e funcionalidades |
+| CSS | Estilização e responsividade |
+| Firebase Firestore | Armazenamento dos eventos, categorias e dados administrativos |
+| Firebase Authentication | Autenticação dos administradores |
+| Firebase Admin SDK | Operações administrativas seguras no backend |
+| Vercel | Hospedagem e disponibilização da aplicação |
+| GitHub | Versionamento e gerenciamento do código-fonte |
+
+## Arquitetura do projeto
+
+O Calendário Villains utiliza uma arquitetura baseada em componentes reutilizáveis, com separação entre interface, páginas, serviços e lógica de negócio.
+
+O **React** é responsável pela experiência do usuário, enquanto o **Firebase** fornece os serviços de autenticação e persistência dos dados.
+
+As operações administrativas sensíveis são protegidas por verificações de permissão e funcionalidades de backend.
+
+A organização do código prioriza legibilidade, manutenção e escalabilidade, permitindo a implementação de novas funcionalidades sem comprometer a estrutura existente.
+
+## Instalação e execução
+
+### Pré-requisitos
+
+- Node.js
+- npm
+- Git
+- Projeto configurado no Firebase
+
+### Clonar o repositório
+
+```bash
+git clone https://github.com/LuizEdu-AR/calendario-villains.git
+```
+
+### Acessar o diretório
+
+```bash
+cd calendario-villains
+```
+
+### Instalar as dependências
+
+```bash
+npm install
+```
+
+### Configurar as variáveis de ambiente
+
+Crie um arquivo `.env` na raiz do projeto:
+
+```env
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
+
+Preencha os campos com as credenciais de configuração da aplicação web fornecidas pelo Firebase Console.
+
+As credenciais administrativas privadas não devem ser armazenadas nesse arquivo nem expostas ao frontend.
+
+### Iniciar o ambiente de desenvolvimento
+
+```bash
+npm run dev
+```
+
+A aplicação estará disponível, por padrão, em:
+
+```text
+http://localhost:5173
+```
+
+### Gerar a versão de produção
+
+```bash
+npm run build
+```
+
+Os arquivos de produção serão gerados no diretório `dist`.
+
+## Segurança
+
+O projeto utiliza Firebase Authentication e regras de segurança do Firestore para controlar o acesso aos dados.
+
+As informações públicas do calendário podem ser consultadas sem autenticação, enquanto operações de criação, edição e exclusão exigem permissões administrativas.
+
+O gerenciamento de contas é realizado por mecanismos protegidos no backend, evitando a exposição de credenciais privilegiadas no navegador.
+
+## Identidade visual
+
+A interface foi desenvolvida com base na identidade visual da fraternidade Villains, utilizando uma paleta predominantemente escura, com detalhes em verde e dourado.
+
+O design prioriza:
+
+- Visual moderno e minimalista.
+- Hierarquia clara das informações.
+- Navegação simples e intuitiva.
+- Uso moderado de ícones.
+- Componentes consistentes e responsivos.
+- Identidade própria, alinhada à fraternidade.
+
+## Evolução do projeto
+
+O Calendário Villains foi estruturado para permitir futuras expansões, incluindo novas páginas, ferramentas administrativas e funcionalidades de gerenciamento da fraternidade.
+
+A proposta inicial é oferecer um calendário completo e funcional, mantendo uma base de código preparada para o crescimento da plataforma.
+
+## Desenvolvedor
+
+**Luiz Eduardo de A. Rodrigues**
+
+GitHub: [@LuizEdu-AR](https://github.com/LuizEdu-AR)
+
+---
+
+© 2026 Villains. Todos os direitos reservados.
+
+*Projeto desenvolvido para a Fraternidade Villains — GTA V Roleplay (FiveM).*

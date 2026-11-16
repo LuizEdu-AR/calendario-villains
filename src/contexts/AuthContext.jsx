@@ -34,6 +34,12 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
+  const refreshProfile = async () => {
+    if (!auth?.currentUser) return;
+    const snapshot = await getDoc(doc(db, 'admins', auth.currentUser.uid));
+    if (snapshot.exists()) setProfile(snapshot.data());
+  };
+
   const login = (id, password) => {
     if (!/^\d+$/.test(id.trim())) throw new Error('ID inválido.');
     return signInWithEmailAndPassword(auth, `${id.trim()}@admins.villains.invalid`, password);
@@ -42,7 +48,7 @@ export function AuthProvider({ children }) {
   const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ user, profile, isAdmin, loading, login, logout, changePassword }}>
+    <AuthContext.Provider value={{ user, profile, isAdmin, loading, login, logout, changePassword, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

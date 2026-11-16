@@ -1,11 +1,30 @@
-import { httpsCallable, getFunctions } from 'firebase/functions';
-import { app } from './firebase';
+import { auth } from './firebase';
 
-function invoke(name, payload) {
-  if (!app) throw new Error('Firebase não configurado.');
-  return httpsCallable(getFunctions(app, 'us-central1'), name)(payload);
+async function request(method, data) {
+  if (!auth?.currentUser) throw new Error('Faça login para continuar.');
+
+  const token = await auth.currentUser.getIdToken();
+  let response;
+  try {
+    response = await fetch('/api/administrators', {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...(data ? { 'Content-Type': 'application/json' } : {}),
+      },
+      ...(data ? { body: JSON.stringify(data) } : {}),
+    });
+  } catch {
+    throw new Error('Não foi possível conectar à API. Verifique se está executando pela Vercel.');
+  }
+
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || 'Falha na operação administrativa.');
+  return result;
 }
 
-export const createAdministrator = (data) => invoke('createAdministrator', data);
-export const removeAdministrator = (uid) => invoke('removeAdministrator', { uid });
-export const updateAdministrator = (data) => invoke('updateAdministrator', data);
+export const listAdministrators = () => request('GET');
+export const createAdministrator = (data) => request('POST', data);
+export const updateAdministrator = (data) => request('PATCH', data);
+export const removeAdministrator = (uid) => request('DELETE', { uid });
+export const completeFirstAccess = (uid) => request('PATCH', { uid, firstAccessComplete: true });

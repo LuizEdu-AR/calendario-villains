@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { doc, updateDoc } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
-import { db } from '../services/firebase';
+import { completeFirstAccess } from '../services/adminService';
 
 export default function FirstAccessModal() {
-  const { user, profile, changePassword } = useAuth();
+  const { user, profile, changePassword, refreshProfile } = useAuth();
   const [dismissed, setDismissed] = useState(false);
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -22,7 +21,8 @@ export default function FirstAccessModal() {
     setBusy(true);
     try {
       if (change) await changePassword(password);
-      await updateDoc(doc(db, 'admins', user.uid), { firstAccessPending: false });
+      await completeFirstAccess(user.uid);
+      await refreshProfile();
       setDismissed(true);
     } catch {
       setError('Não foi possível concluir. Tente novamente.');

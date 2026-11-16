@@ -248,3 +248,27 @@ h1, h2, h3, h4, p { margin-top: 0; }
   text-decoration: line-through;
   text-decoration-thickness: 1px;
 }
+
+/* Gerenciamento de administradores e perfil */
+.admin-manager-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.admin-manager-top .muted { margin: 0; font-size: 13px; }
+.admin-manager-top .button { padding: 9px 13px; font-size: 12px; white-space: nowrap; }
+.admin-list-users .admin-item { padding: 14px 16px; }
+.admin-list-users .admin-item h3 { font-size: 14px; margin: 0 0 5px; }
+.admin-list-users .admin-item p { font-size: 12px; margin: 0; }
+.admin-role-tag { font-size: 10px; color: #62c987; margin-left: 6px; font-weight: 600; }
+.admin-icon-actions { display: flex; gap: 7px; align-items: center; }
+.admin-icon-actions button { padding: 8px 10px; font-size: 12px; }
+.admin-icon-actions .admin-trash { display: inline-flex; align-items: center; justify-content: center; padding: 8px; }
+.admin-editor-modal { max-width: 440px; width: calc(100% - 32px); }
+.admin-editor-modal .form-stack { gap: 14px; }
+.admin-editor-modal .form-stack label { font-size: 12px; }
+.account-label { margin-top: 22px; }
+.profile-manager > .muted { margin-top: 0; font-size: 13px; }
+.profile-form { max-width: 480px; margin-top: 22px; }
+.profile-form h3 { font-size: 16px; margin: 0 0 6px; }
+.profile-form label { font-size: 12px; }
+.profile-form .button { align-self: flex-start; font-size: 12px; }
+.profile-password { border-top: 1px solid rgba(255,255,255,.1); padding-top: 24px; margin-top: 28px; }
+.profile-password .muted { font-size: 12px; }
+@media (max-width: 540px) { .admin-manager-top { align-items: flex-start; } .admin-list-users .admin-item { gap: 10px; } }

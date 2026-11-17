@@ -293,3 +293,23 @@ h1, h2, h3, h4, p { margin-top: 0; }
   .form-two>label:last-child .date-popover,
   .form-two>label:last-child .time-popover{left:auto;right:0}
 }
+
+/* Villains: carregamento sem dados temporários e seletor de categorias */
+.calendar-loading{min-height:330px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:15px;color:#94a99a;font-size:12px;text-align:center}
+.villains-spinner{display:block;width:32px;height:32px;border:3px solid #304238;border-top-color:#62cf7e;border-radius:50%;animation:villains-spin .75s linear infinite}
+@keyframes villains-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.villains-spinner{animation-duration:2s}}
+.category-picker{position:relative;min-width:0}
+.category-picker-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:45px;padding:0 13px;border:1px solid #35463a;border-radius:9px;background:#0e1510;color:#eaf1ea;font:inherit;font-size:12px;text-align:left;cursor:pointer}
+.category-picker-trigger:hover,.category-picker-trigger[aria-expanded=true]{border-color:#5dc978}
+.category-picker-choice{display:flex;align-items:center;gap:9px;min-width:0}
+.category-picker-dot{width:9px;height:9px;flex:0 0 9px;border-radius:50%}
+.category-picker-menu{position:absolute;z-index:130;top:calc(100% + 6px);left:0;right:0;min-width:0;background:#1b231d;border:1px solid #354b3b;border-radius:11px;padding:7px;box-shadow:0 16px 35px #000a}
+.category-picker-search{display:flex;align-items:center;gap:8px;border:1px solid #35463a;border-radius:7px;padding:0 10px;color:#93a998;background:#101811}
+.category-picker-search input{width:100%;min-width:0;height:36px;padding:0;border:0;outline:0;background:transparent;color:#eaf1ea;font-size:12px}
+.category-picker-options{max-height:205px;overflow-y:auto;overscroll-behavior:contain;padding-top:5px}
+.category-picker-options button{width:100%;display:flex;align-items:center;gap:9px;padding:10px 9px;border:0;border-radius:7px;background:transparent;color:#e4eee5;text-align:left;font:inherit;font-size:12px;cursor:pointer}
+.category-picker-options button span:nth-child(2){flex:1}
+.category-picker-options button:hover{background:#293a2d}
+.category-picker-options button.selected{background:#244630;color:#80e59b}
+.category-picker-empty{padding:10px;color:#a2afa5;font-size:12px}

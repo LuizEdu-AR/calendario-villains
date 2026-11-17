@@ -1,4 +1,5 @@
 import { DatePicker, TimePicker } from './DateTimePickers';
+import CategoryPicker from './CategoryPicker';
 import { useEffect, useState } from 'react';
 
 const blank = {
@@ -29,7 +30,7 @@ export default function EventForm({ event, categories, onSave, onClose, busy }) 
     <form onSubmit={submit} className="form-stack">
       {validation && <p className="notice error" role="alert">{validation}</p>}
       <label>Nome do evento<input required maxLength="120" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Ex.: Reunião da fraternidade" /></label>
-      <label>Categoria<select required value={form.categoryId} onChange={(e) => set('categoryId', e.target.value)}><option value="">Selecione</option>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select></label>
+      <label>Categoria<CategoryPicker categories={categories} value={form.categoryId} onChange={(value) => set('categoryId', value)} /></label>
       <div className="form-two"><label>Data de início<DatePicker required value={form.startDate} onChange={(value) => set('startDate', value)} /></label><label>Data final (opcional)<DatePicker min={form.startDate} value={form.endDate} onChange={(value) => set('endDate', value)} /></label></div>
       <label className="check-label"><input type="checkbox" checked={form.allDay} onChange={(e) => set('allDay', e.target.checked)} /> Dia inteiro</label>
       {!form.allDay && <div className="form-two"><label>Início<TimePicker required value={form.startTime} onChange={(value) => set('startTime', value)} /></label><label>Término<TimePicker required value={form.endTime} onChange={(value) => set('endTime', value)} /></label></div>}

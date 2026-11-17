@@ -10,12 +10,7 @@ import { useCalendar } from '../contexts/CalendarContext';
 import { dateKey, eventOnDate, monthLabel, sortEvents } from '../utils/dates';
 
 export default function PublicCalendar() {
-  const { events, categories: savedCategories, initialCategories, loading, error } = useCalendar();
-  // Exibe as categorias padrão enquanto não houver categorias salvas no Firestore.
-  const categories = useMemo(() => savedCategories.length
-    ? savedCategories
-    : initialCategories.map((category, index) => ({ ...category, id: `default-${index}` })),
-  [savedCategories, initialCategories]);
+  const { events, categories, loading, error } = useCalendar();
   const [month, setMonth] = useState(() => new Date());
   const [view, setView] = useState('month');
   const [visible, setVisible] = useState([]);
@@ -51,9 +46,9 @@ export default function PublicCalendar() {
     <div className="app-shell">
       <Header />
       <main className="container public-main">
-        <div className="toolbar"><div className="segmented"><button className={view === 'month' ? 'active' : ''} onClick={() => setView('month')}><CalendarDays size={15} /> Mês</button><button className={view === 'list' ? 'active' : ''} onClick={() => setView('list')}><List size={15} /> Lista</button></div><div className="upcoming-strip"><span className="live-dot" />{upcoming ? <><strong>A seguir</strong><span>{upcoming.title}</span><small>{nextCategory?.name || 'Evento'}</small><button onClick={() => setSelected(upcoming)}>Ver detalhes</button></> : <span>Novos eventos serão anunciados aqui.</span>}</div><span className="timezone"><Clock3 size={15} /> Horário de Brasília</span></div>
+        {!loading && !error && <div className="toolbar"><div className="segmented"><button className={view === 'month' ? 'active' : ''} onClick={() => setView('month')}><CalendarDays size={15} /> Mês</button><button className={view === 'list' ? 'active' : ''} onClick={() => setView('list')}><List size={15} /> Lista</button></div><div className="upcoming-strip"><span className="live-dot" />{upcoming ? <><strong>A seguir</strong><span>{upcoming.title}</span><small>{nextCategory?.name || 'Evento'}</small><button onClick={() => setSelected(upcoming)}>Ver detalhes</button></> : <span>Novos eventos serão anunciados aqui.</span>}</div><span className="timezone"><Clock3 size={15} /> Horário de Brasília</span></div>}
         {error && <p className="notice error">{error}</p>}
-        <div className="public-layout"><CategorySidebar categories={categoryCounts} visible={visible} toggle={toggle} eventCount={monthlyEvents.length} /><section className="calendar-panel"><div className="calendar-header"><div className="month-controls"><button onClick={() => changeMonth(-1)} aria-label="Mês anterior">‹</button><button onClick={() => changeMonth(1)} aria-label="Próximo mês">›</button></div><h2>{monthLabel(month)}</h2><button className="text-button today-link" onClick={() => setMonth(new Date())}>Hoje</button></div>{loading ? <div className="empty-state">Carregando eventos...</div> : view === 'month' ? <MonthCalendar month={month} events={filtered} categories={categories} onSelect={setSelected} now={now} /> : <ListCalendar month={month} events={filtered} categories={categories} onSelect={setSelected} now={now} />}</section></div>
+        {loading ? <div className="calendar-loading" role="status" aria-live="polite"><span className="villains-spinner" aria-hidden="true" /><span>Carregando calendário...</span></div> : error ? <div className="calendar-loading"><p>Não foi possível carregar os dados.</p><button type="button" className="button subtle" onClick={() => window.location.reload()}>Tentar novamente</button></div> : <div className="public-layout"><CategorySidebar categories={categoryCounts} visible={visible} toggle={toggle} eventCount={monthlyEvents.length} /><section className="calendar-panel"><div className="calendar-header"><div className="month-controls"><button onClick={() => changeMonth(-1)} aria-label="Mês anterior">‹</button><button onClick={() => changeMonth(1)} aria-label="Próximo mês">›</button></div><h2>{monthLabel(month)}</h2><button className="text-button today-link" onClick={() => setMonth(new Date())}>Hoje</button></div>{view === 'month' ? <MonthCalendar month={month} events={filtered} categories={categories} onSelect={setSelected} now={now} /> : <ListCalendar month={month} events={filtered} categories={categories} onSelect={setSelected} now={now} />}</section></div>}
         <div className="bottom-note">As datas e horários podem sofrer alterações. Consulte este calendário antes de se programar.</div>
         <Footer />
       </main>

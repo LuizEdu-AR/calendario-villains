@@ -512,3 +512,21 @@ h1, h2, h3, h4, p { margin-top: 0; }
   .calendar-multiday { margin-top: calc(29px + var(--multi-lane) * 21px); height: 17px; padding: 2px 3px; font-size: 8px; }
   .calendar-multiday .multi-end-time { display: none; }
 }
+
+/* A semana é uma grade independente: as faixas não ocupam células da grade mensal. */
+.calendar-week { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); position: relative; min-width: 0; }
+.calendar-week > .calendar-day { grid-row: 1; }
+.calendar-week > .calendar-day:nth-child(7) { border-right: 0; }
+.calendar-week > .calendar-multiday {
+  position: absolute;
+  left: calc(var(--span-start) * 100% / 7 + 2px);
+  width: calc(var(--span-days) * 100% / 7 - 4px);
+  top: calc(34px + var(--multi-lane) * 23px);
+  margin: 0;
+  box-sizing: border-box;
+  font-family: inherit;
+  line-height: 1.2;
+}
+@media (max-width: 740px) {
+  .calendar-week > .calendar-multiday { top: calc(29px + var(--multi-lane) * 21px); }
+}

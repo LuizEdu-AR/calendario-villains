@@ -463,7 +463,15 @@ h1, h2, h3, h4, p { margin-top: 0; }
 .villains-select-options::-webkit-scrollbar,.category-picker-options::-webkit-scrollbar{display:none}
 .category-picker-options{scrollbar-width:none}
 .villains-select-options button{width:100%;display:flex;align-items:center;gap:9px;padding:10px 9px;border:0;border-radius:7px;background:transparent;color:#e4eee5;text-align:left;font:inherit;font-size:12px;cursor:pointer}
-.villains-select-options button span:nth-last-child(2){flex:1}
+.villains-select-options button .villains-select-option-label{flex:1;min-width:0}
+.villains-select-options .category-picker-dot,.villains-select-value .category-picker-dot{display:inline-block;width:9px;height:9px;min-width:9px;max-width:9px;flex:0 0 9px;border-radius:50%;align-self:center}
 .villains-select-options button:hover{background:#293a2d}
 .villains-select-options button.selected{background:#244630;color:#80e59b}
 .admin-item .status{font-size:10px;line-height:1.2;font-weight:700;padding:4px 8px}
+
+/* Visibilidade independente dos campos de senha */
+.password-input-wrap{position:relative;display:block}
+.password-input-wrap input{width:100%;padding-right:44px}
+.password-visibility-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;border:0;background:transparent;color:#9bac9f;cursor:pointer;border-radius:7px}
+.password-visibility-toggle:hover,.password-visibility-toggle:focus-visible{color:#72d98c;background:#253629}
+.profile-password-error{color:#ff9292;font-size:12px;margin:0}

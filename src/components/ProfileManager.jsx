@@ -1,4 +1,5 @@
 import { Toast } from './Feedback';
+import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { updateAdministrator } from '../services/adminService';
@@ -8,6 +9,9 @@ export default function ProfileManager() {
   const [name, setName] = useState(profile?.name || '');
   const [id, setId] = useState(profile?.id || '');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [messageTone, setMessageTone] = useState('success');
@@ -36,11 +40,12 @@ export default function ProfileManager() {
       <label>Nome<input required value={name} onChange={(event) => setName(event.target.value)} /></label>
       <button className="button subtle" disabled={busy}>Salvar dados</button>
     </form>
-    <form className="form-stack profile-form profile-password" onSubmit={(event) => { event.preventDefault(); perform(async () => { await changePassword(password); setPassword(''); }, 'Senha atualizada.'); }}>
+    <form className="form-stack profile-form profile-password" onSubmit={(event) => { event.preventDefault(); if (password !== confirmPassword || password.length < 6) return; perform(async () => { await changePassword(password); setPassword(''); setConfirmPassword(''); setShowPassword(false); setShowConfirmPassword(false); }, 'Senha atualizada.'); }}>
       <h3>Alterar minha senha</h3>
-      <label>Nova senha<input type="password" minLength={6} required value={password} onChange={(event) => setPassword(event.target.value)} /></label>
-      <button className="button subtle" disabled={busy}>Alterar senha</button>
-      <p className="muted">O Firebase pode solicitar que você faça login novamente antes de alterar a senha.</p>
+      <label>Nova senha<span className="password-input-wrap"><input type={showPassword ? 'text' : 'password'} minLength={6} required autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} /><button type="button" className="password-visibility-toggle" aria-label={showPassword ? 'Ocultar nova senha' : 'Mostrar nova senha'} aria-pressed={showPassword} onClick={() => setShowPassword((value) => !value)}>{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></span></label>
+      <label>Confirmar nova senha<span className="password-input-wrap"><input type={showConfirmPassword ? 'text' : 'password'} minLength={6} required autoComplete="new-password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} /><button type="button" className="password-visibility-toggle" aria-label={showConfirmPassword ? 'Ocultar confirmação da senha' : 'Mostrar confirmação da senha'} aria-pressed={showConfirmPassword} onClick={() => setShowConfirmPassword((value) => !value)}>{showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></span></label>
+      {confirmPassword && password !== confirmPassword && <p className="profile-password-error" role="alert">As senhas não coincidem.</p>}
+      <button className="button subtle" disabled={busy || password.length < 6 || password !== confirmPassword}>Alterar senha</button>
     </form>
   </div>;
 }

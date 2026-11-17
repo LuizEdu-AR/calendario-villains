@@ -1,3 +1,4 @@
+import { Toast, ConfirmDialog } from '../components/Feedback';
 import { useMemo, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -25,6 +26,7 @@ export default function AdminPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   const selectedEvents = useMemo(() => sortEvents(events.filter((event) => eventOnDate(event, selectedDate))), [events, selectedDate]);
   const matchingEvents = sortEvents(events.filter((event) => event.title?.toLowerCase().includes(query.toLowerCase())));
@@ -66,8 +68,7 @@ export default function AdminPage() {
       setError('Esta categoria possui eventos vinculados. Altere a categoria desses eventos antes de removê-la.');
       return;
     }
-    if (!window.confirm(`Deseja realmente excluir "${item.title || item.name}"?`)) return;
-    perform(() => removeRecord(name, item.id), 'Item excluído com sucesso.');
+    setConfirmDelete({ name, item });
   }
 
   async function seedCategories() {
@@ -84,8 +85,7 @@ export default function AdminPage() {
       <Header admin />
       <main className="container admin-main">
         <div className="admin-heading"><div><span className="overline">ÁREA RESTRITA</span><h1>Painel administrativo<span className="green-period">.</span></h1><p>Gerencie os eventos e as categorias da fraternidade.</p></div><button className="button subtle" onClick={logout}>Sair da conta</button></div>
-        {(error || dataError) && <p className="notice error">{error || dataError}</p>}
-        {success && <p className="notice success">{success}</p>}
+
         <div className="admin-layout">
           <aside className="admin-menu"><p className="menu-label">GERENCIAMENTO</p><button className={section === 'events' ? 'selected' : ''} onClick={() => setSection('events')}>Eventos <span>{events.length}</span></button><button className={section === 'categories' ? 'selected' : ''} onClick={() => setSection('categories')}>Categorias <span>{categories.length}</span></button><button className={section === 'admins' ? 'selected' : ''} onClick={() => setSection('admins')}>Administradores</button><p className="menu-label account-label">CONTA</p><button className={section === 'profile' ? 'selected' : ''} onClick={() => setSection('profile')}>Perfil</button><div className="admin-menu-footer">Calendário Villains <small>Gestão da fraternidade</small></div></aside>
           <section className="admin-content"><div className="content-heading"><div><span className="overline">ORGANIZAÇÃO</span><h2>{section === 'events' ? 'Eventos' : section === 'categories' ? 'Categorias' : section === 'admins' ? 'Administradores' : 'Perfil'}</h2></div>{section !== 'admins' && section !== 'profile' && <button className="button primary" onClick={() => openModal(section === 'events' ? 'event' : 'category')}>+ {section === 'events' ? 'Novo evento' : 'Nova categoria'}</button>}</div>
@@ -96,6 +96,9 @@ export default function AdminPage() {
       </main>
       <Footer />
       <FirstAccessModal />
+      <Toast message={error || dataError} tone="error" onClose={() => setError('')} />
+      <Toast message={success} onClose={() => setSuccess('')} />
+      {confirmDelete && <ConfirmDialog title={confirmDelete.name === 'events' ? 'Excluir evento' : 'Excluir categoria'} description={`Tem certeza de que deseja excluir “${confirmDelete.item.title || confirmDelete.item.name}”? Esta ação não poderá ser desfeita.`} confirmLabel="Excluir" danger busy={busy} onCancel={() => setConfirmDelete(null)} onConfirm={async () => { const { name, item } = confirmDelete; await perform(() => removeRecord(name, item.id), 'Item excluído com sucesso.'); setConfirmDelete(null); }} />}
       {modal && <div className="modal-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) setModal(null); }}><div className="editor-modal" role="dialog" aria-modal="true"><div className="editor-heading"><h2>{modal === 'event' ? editing ? 'Editar evento' : 'Novo evento' : editing ? 'Editar categoria' : 'Nova categoria'}</h2><button className="close-button" onClick={() => setModal(null)} aria-label="Fechar">×</button></div>{error && <p className="notice error">{error}</p>}{modal === 'event' ? <EventForm event={editing} categories={categories} onSave={saveEvent} onClose={() => setModal(null)} busy={busy} /> : <CategoryForm category={editing} onSave={saveCategory} onClose={() => setModal(null)} busy={busy} />}</div></div>}
     </div>
   );

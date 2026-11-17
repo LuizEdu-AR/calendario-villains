@@ -1,3 +1,4 @@
+import { Toast } from './Feedback';
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { updateAdministrator } from '../services/adminService';
@@ -9,14 +10,17 @@ export default function ProfileManager() {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
+  const [messageTone, setMessageTone] = useState('success');
 
   async function perform(action, success) {
     setBusy(true);
     setMessage('');
     try {
       await action();
+      setMessageTone('success');
       setMessage(success);
     } catch (error) {
+      setMessageTone('error');
       setMessage(error.message || 'Não foi possível concluir.');
     } finally {
       setBusy(false);
@@ -25,7 +29,7 @@ export default function ProfileManager() {
 
   return <div className="profile-manager">
     <p className="muted">Gerencie os dados da sua conta.</p>
-    {message && <p className="notice" role="status">{message}</p>}
+    <Toast message={message} tone={messageTone} onClose={() => setMessage('')} />
     <form className="form-stack profile-form" onSubmit={(event) => { event.preventDefault(); perform(async () => { await updateAdministrator({ uid: user.uid, name, id }); await refreshProfile(); }, 'Perfil atualizado.'); }}>
       <h3>Meus dados</h3>
       <label>ID<input required pattern="[0-9]+" inputMode="numeric" disabled={profile?.id === '194'} value={id} onChange={(event) => setId(event.target.value)} /></label>

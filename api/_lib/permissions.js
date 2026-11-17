@@ -15,7 +15,11 @@ export async function requireAdministrator(req) {
   let decoded;
   try {
     decoded = await auth.verifyIdToken(authorization.slice(7), true);
-  } catch {
+  } catch (error) {
+    console.error('Falha na validação Firebase:', {
+      code: error.code || 'unknown',
+      message: error.message || 'Erro desconhecido'
+    });
     throw new ApiError(401, 'Sessão inválida ou expirada.');
   }
 

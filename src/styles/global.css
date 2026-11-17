@@ -23,7 +23,7 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
 .container { max-width: 1320px; margin: auto; padding-left: 28px; padding-right: 28px; }
 .app-shell { min-height: 100vh; background: radial-gradient(ellipse 55% 35% at 88% 0%, rgba(46, 105, 48, .12), transparent), var(--bg); }
-.site-header { position: sticky; top: 12px; z-index: 200; margin-top: 12px; min-height: 68px; display: flex; align-items: center; justify-content: space-between; border-bottom: none; gap: 20px; background: transparent; border-radius: 16px; transition: background-color 240ms ease, backdrop-filter 240ms ease, box-shadow 240ms ease; }
+.site-header { position: sticky; top: 12px; z-index: 200; margin-top: 0; min-height: 68px; display: flex; align-items: center; justify-content: space-between; border-bottom: none; gap: 20px; background: transparent; border-radius: 16px; transition: background-color 240ms ease, backdrop-filter 240ms ease, box-shadow 240ms ease; }
 .site-header.is-scrolled { background: rgba(17, 24, 18, .46); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 8px 28px rgba(0, 0, 0, .14); }
 .brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
 .brand img { width: 82px; height: 48px; object-fit: contain; }

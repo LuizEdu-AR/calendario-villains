@@ -443,3 +443,27 @@ h1, h2, h3, h4, p { margin-top: 0; }
   background: transparent !important;
   border-radius: 999px;
 }
+
+/* Controles consistentes nos filtros e formulários */
+.event-filter-grid label>.villains-select,.event-filter-grid label>.villains-picker{width:100%;min-width:0}
+.event-filter-grid label>.villains-select .villains-select-trigger,.event-filter-grid label>.villains-picker .picker-trigger{height:36px;min-height:36px;padding:0 10px;font-size:12px}
+.event-filter-grid label>.villains-picker .date-popover{left:auto;right:0}
+.event-filter-grid label:nth-child(odd)>.villains-picker .date-popover{left:0;right:auto}
+.event-filter-grid label>.villains-picker .date-popover{max-width:min(296px,calc(100vw - 45px))}
+.event-filter-grid label>select,.event-filter-grid label>input{width:100%}
+.event-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+.event-admin-filters{width:100%}
+.villains-select{position:relative;min-width:0;width:100%}
+.villains-select-trigger{width:100%;min-height:45px;padding:0 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #35463a;border-radius:9px;background:#0e1510;color:#eaf1ea;font:inherit;font-size:12px;text-align:left;cursor:pointer}
+.villains-select-trigger:hover,.villains-select-trigger[aria-expanded=true]{border-color:#5dc978}
+.villains-select-trigger svg{flex-shrink:0}
+.villains-select-value{display:flex;align-items:center;gap:9px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.villains-select-menu{position:absolute;z-index:150;top:calc(100% + 6px);left:0;right:0;min-width:0;padding:7px;background:#1b231d;border:1px solid #354b3b;border-radius:11px;box-shadow:0 16px 35px #000a}
+.villains-select-options{max-height:205px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.villains-select-options::-webkit-scrollbar,.category-picker-options::-webkit-scrollbar{display:none}
+.category-picker-options{scrollbar-width:none}
+.villains-select-options button{width:100%;display:flex;align-items:center;gap:9px;padding:10px 9px;border:0;border-radius:7px;background:transparent;color:#e4eee5;text-align:left;font:inherit;font-size:12px;cursor:pointer}
+.villains-select-options button span:nth-last-child(2){flex:1}
+.villains-select-options button:hover{background:#293a2d}
+.villains-select-options button.selected{background:#244630;color:#80e59b}
+.admin-item .status{font-size:10px;line-height:1.2;font-weight:700;padding:4px 8px}

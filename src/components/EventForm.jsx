@@ -1,3 +1,4 @@
+import SelectPicker from './SelectPicker';
 import { DatePicker, TimePicker } from './DateTimePickers';
 import CategoryPicker from './CategoryPicker';
 import { useEffect, useState } from 'react';
@@ -34,7 +35,7 @@ export default function EventForm({ event, categories, onSave, onClose, busy }) 
       <div className="form-two"><label>Data de início<DatePicker required value={form.startDate} onChange={(value) => set('startDate', value)} /></label><label>Data final (opcional)<DatePicker min={form.startDate} value={form.endDate} onChange={(value) => set('endDate', value)} /></label></div>
       <label className="check-label"><input type="checkbox" checked={form.allDay} onChange={(e) => set('allDay', e.target.checked)} /> Dia inteiro</label>
       {!form.allDay && <div className="form-two"><label>Início<TimePicker required value={form.startTime} onChange={(value) => set('startTime', value)} /></label><label>Término<TimePicker required value={form.endTime} onChange={(value) => set('endTime', value)} /></label></div>}
-      <label>Status<select value={form.status} onChange={(e) => set('status', e.target.value)}><option value="scheduled">Agendado</option><option value="completed">Concluído</option><option value="cancelled">Cancelado</option></select></label>
+      <label>Status<SelectPicker value={form.status} onChange={(value) => set('status', value)} options={[{value:'scheduled',label:'Agendado'},{value:'completed',label:'Concluído'},{value:'cancelled',label:'Cancelado'}]} /></label>
       <label>Descrição<textarea rows="4" value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="Informações adicionais para os participantes" /></label>
       <div className="modal-actions"><button type="button" className="button subtle" onClick={onClose}>Cancelar</button><button type="submit" className="button primary" disabled={busy}>{busy ? 'Salvando...' : event ? 'Salvar alterações' : 'Criar evento'}</button></div>
     </form>

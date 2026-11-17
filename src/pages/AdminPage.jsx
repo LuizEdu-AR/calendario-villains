@@ -7,6 +7,8 @@ import AdminManager from '../components/AdminManager';
 import ProfileManager from '../components/ProfileManager';
 import EventForm from '../components/EventForm';
 import CategoryForm from '../components/CategoryForm';
+import SelectPicker from '../components/SelectPicker';
+import { DatePicker } from '../components/DateTimePickers';
 import { useAuth } from '../contexts/AuthContext';
 import { useCalendar } from '../contexts/CalendarContext';
 import { createRecord, initialCategories, removeRecord, updateRecord } from '../services/calendarService';
@@ -131,11 +133,11 @@ export default function AdminPage() {
               <div className="event-admin-filters">
                 <input className="search-input" placeholder="Pesquisar eventos..." aria-label="Pesquisar eventos" value={query} onChange={(e) => { setQuery(e.target.value); resetPage(); }} />
                 <div className="event-filter-grid">
-                  <label>Categoria<select value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); resetPage(); }}><option value="all">Todas as categorias</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
-                  <label>Status<select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); resetPage(); }}><option value="all">Todos os status</option><option value="scheduled">Agendados</option><option value="ongoing">Em andamento</option><option value="ended">Encerrados</option><option value="completed">Concluídos</option><option value="cancelled">Cancelados</option></select></label>
-                  <label>Data inicial<input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); resetPage(); }} /></label>
-                  <label>Data final<input type="date" min={dateFrom || undefined} value={dateTo} onChange={(e) => { setDateTo(e.target.value); resetPage(); }} /></label>
-                  <label>Ordenar por<select value={eventOrder} onChange={(e) => { setEventOrder(e.target.value); resetPage(); }}><option value="dateAsc">Data — mais próximos primeiro</option><option value="dateDesc">Data — mais distantes primeiro</option><option value="nameAsc">Nome — A a Z</option><option value="nameDesc">Nome — Z a A</option></select></label>
+                  <label>Categoria<SelectPicker searchable value={categoryFilter} onChange={(value) => { setCategoryFilter(value); resetPage(); }} options={[{value:'all',label:'Todas as categorias'}, ...categories.map((category) => ({value:category.id,label:category.name,color:category.color}))]} /></label>
+                  <label>Status<SelectPicker value={statusFilter} onChange={(value) => { setStatusFilter(value); resetPage(); }} options={[{value:'all',label:'Todos os status'},{value:'scheduled',label:'Agendados'},{value:'ongoing',label:'Em andamento'},{value:'ended',label:'Encerrados'},{value:'completed',label:'Concluídos'},{value:'cancelled',label:'Cancelados'}]} /></label>
+                  <label>Data inicial<DatePicker value={dateFrom} onChange={(value) => { setDateFrom(value); if (dateTo && value && dateTo < value) setDateTo(''); resetPage(); }} /></label>
+                  <label>Data final<DatePicker min={dateFrom || undefined} value={dateTo} onChange={(value) => { setDateTo(value); resetPage(); }} /></label>
+                  <label>Ordenar por<SelectPicker value={eventOrder} onChange={(value) => { setEventOrder(value); resetPage(); }} options={[{value:'dateAsc',label:'Data — mais próximos primeiro'},{value:'dateDesc',label:'Data — mais distantes primeiro'},{value:'nameAsc',label:'Nome — A a Z'},{value:'nameDesc',label:'Nome — Z a A'}]} /></label>
                   <div className="event-clear-wrap"><button type="button" className="event-clear-filters" onClick={() => { setQuery(''); setCategoryFilter('all'); setStatusFilter('all'); setDateFrom(''); setDateTo(''); setEventOrder('dateAsc'); resetPage(); }}>Limpar filtros</button></div>
                 </div>
               </div>

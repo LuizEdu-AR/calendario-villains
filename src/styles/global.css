@@ -360,3 +360,26 @@ h1, h2, h3, h4, p { margin-top: 0; }
   .calendar-panel { padding: 11px; }
   .admin-menu, .admin-content, .admin-date-panel { padding: 14px; }
 }
+
+/* Filtros e paginação compactos da administração */
+.event-admin-filters{margin-bottom:10px}
+.event-admin-filters .search-input{margin-bottom:9px}
+.event-filter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.event-filter-grid label{display:flex;flex-direction:column;gap:5px;min-width:0;font-size:10px;font-weight:600;color:#a9b9ad}
+.event-filter-grid select,.event-filter-grid input{width:100%;min-width:0;min-height:34px;padding:7px 9px;border:1px solid #354339;border-radius:8px;background:#101510;color:#eaf1ea;font:inherit;font-size:11px;outline:none;color-scheme:dark}
+.event-filter-grid select:focus,.event-filter-grid input:focus{border-color:#5dc978}
+.event-clear-filters{align-self:end;min-height:34px;padding:7px 10px;border:1px solid #354339;border-radius:8px;background:#202a22;color:#d5e5d8;font-size:11px;cursor:pointer}
+.event-results-count{margin:5px 0 10px;color:#93a998;font-size:10px}
+.event-pagination{display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;margin-top:15px;font-size:11px}
+.event-pagination button{min-width:29px;min-height:30px;padding:5px 9px;border:1px solid #343b39;border-radius:7px;background:#141b17;color:#eaf1ea;cursor:pointer;font:inherit}
+.event-pagination button.active{background:#2c7744;border-color:#4fbe71;color:white}
+.event-pagination button:disabled{opacity:.35;cursor:not-allowed}
+.page-segment{display:inline-flex;align-items:center;gap:5px}
+.page-ellipsis{padding:0 3px;color:#a5b5a9}
+.page-jump{display:inline-flex;align-items:center;gap:6px;margin-left:5px;color:#a5b5a9;white-space:nowrap}
+.page-jump input{width:43px;min-height:30px;padding:4px;border:1px solid #343b39;border-radius:7px;background:#101510;color:#eaf1ea;text-align:center;font:inherit;appearance:textfield}
+.page-jump input::-webkit-inner-spin-button,.page-jump input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+/* Mantém a rolagem do seletor sem exibir a barra branca */
+.category-picker-options{scrollbar-width:none;-ms-overflow-style:none}
+.category-picker-options::-webkit-scrollbar{display:none;width:0;height:0}
+@media(max-width:540px){.event-filter-grid{grid-template-columns:1fr 1fr}.event-pagination{gap:4px}.event-pagination button{padding:5px 7px}}

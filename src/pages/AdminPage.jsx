@@ -12,6 +12,7 @@ import { useCalendar } from '../contexts/CalendarContext';
 import { createRecord, initialCategories, removeRecord, updateRecord } from '../services/calendarService';
 import { dateKey, eventOnDate, fullDate, getMonthCells, getStatus, monthLabel, parseDate, sortEvents } from '../utils/dates';
 
+const EVENTS_PER_PAGE = 8;
 const weekdays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
 export default function AdminPage() {
@@ -21,6 +22,14 @@ export default function AdminPage() {
   const [month, setMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(dateKey(new Date()));
   const [query, setQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [eventOrder, setEventOrder] = useState('dateAsc');
+  const [page, setPage] = useState(1);
+  const [pageInput, setPageInput] = useState('1');
+  const resetPage = () => { setPage(1); setPageInput('1'); };
   const [modal, setModal] = useState(null);
   const [editing, setEditing] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -29,7 +38,36 @@ export default function AdminPage() {
   const [confirmDelete, setConfirmDelete] = useState(null);
 
   const selectedEvents = useMemo(() => sortEvents(events.filter((event) => eventOnDate(event, selectedDate))), [events, selectedDate]);
-  const matchingEvents = sortEvents(events.filter((event) => event.title?.toLowerCase().includes(query.toLowerCase())));
+  const matchingEvents = useMemo(() => {
+    const normalized = query.trim().toLocaleLowerCase('pt-BR');
+    const filtered = events.filter((event) => {
+      if (normalized && !event.title?.toLocaleLowerCase('pt-BR').includes(normalized)) return false;
+      if (categoryFilter !== 'all' && event.categoryId !== categoryFilter) return false;
+      if (statusFilter !== 'all') {
+        const status = getStatus(event);
+        const key = event.status === 'cancelled' ? 'cancelled' : status.label === 'Agendado' ? 'scheduled' : status.label === 'Em andamento' ? 'ongoing' : status.label === 'Encerrado' ? 'ended' : status.label === 'Concluído' ? 'completed' : 'other';
+        if (key !== statusFilter) return false;
+      }
+      if (dateFrom && (event.endDate || event.startDate) < dateFrom) return false;
+      if (dateTo && event.startDate > dateTo) return false;
+      return true;
+    });
+    filtered.sort((a, b) => {
+      if (eventOrder.startsWith('name')) return (a.title || '').localeCompare(b.title || '', 'pt-BR') * (eventOrder === 'nameDesc' ? -1 : 1);
+      const cmp = `${a.startDate} ${a.startTime || '00:00'}`.localeCompare(`${b.startDate} ${b.startTime || '00:00'}`);
+      return eventOrder === 'dateDesc' ? -cmp : cmp;
+    });
+    return filtered;
+  }, [events, query, categoryFilter, statusFilter, dateFrom, dateTo, eventOrder]);
+  const totalPages = Math.max(1, Math.ceil(matchingEvents.length / EVENTS_PER_PAGE));
+  const currentPage = Math.min(page, totalPages);
+  const pagedEvents = matchingEvents.slice((currentPage - 1) * EVENTS_PER_PAGE, currentPage * EVENTS_PER_PAGE);
+  function goToPage(next) {
+    const valid = Math.min(totalPages, Math.max(1, Number(next) || 1));
+    setPage(valid);
+    setPageInput(String(valid));
+  }
+  const visiblePages = Array.from(new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1].filter((n) => n >= 1 && n <= totalPages))).sort((a, b) => a - b);
 
   function openModal(kind, item = null) {
     setEditing(item);
@@ -89,7 +127,22 @@ export default function AdminPage() {
         {calendarLoading ? <div className="calendar-loading" role="status"><span className="villains-spinner" aria-hidden="true" /><span>Carregando dados...</span></div> : dataError ? <div className="calendar-loading"><p>Não foi possível carregar os dados.</p><button className="button subtle" onClick={() => window.location.reload()}>Tentar novamente</button></div> : <div className="admin-layout">
           <aside className="admin-menu"><p className="menu-label">GERENCIAMENTO</p><button className={section === 'events' ? 'selected' : ''} onClick={() => setSection('events')}>Eventos <span>{events.length}</span></button><button className={section === 'categories' ? 'selected' : ''} onClick={() => setSection('categories')}>Categorias <span>{categories.length}</span></button><button className={section === 'admins' ? 'selected' : ''} onClick={() => setSection('admins')}>Administradores</button><p className="menu-label account-label">CONTA</p><button className={section === 'profile' ? 'selected' : ''} onClick={() => setSection('profile')}>Perfil</button><div className="admin-menu-footer">Calendário Villains <small>Gestão da fraternidade</small></div></aside>
           <section className="admin-content"><div className="content-heading"><div><span className="overline">ORGANIZAÇÃO</span><h2>{section === 'events' ? 'Eventos' : section === 'categories' ? 'Categorias' : section === 'admins' ? 'Administradores' : 'Perfil'}</h2></div>{section !== 'admins' && section !== 'profile' && <button className="button primary" onClick={() => openModal(section === 'events' ? 'event' : 'category')}>+ {section === 'events' ? 'Novo evento' : 'Nova categoria'}</button>}</div>
-            {section === 'admins' ? <AdminManager /> : section === 'profile' ? <ProfileManager /> : section === 'events' ? <><input className="search-input" placeholder="Pesquisar eventos..." value={query} onChange={(e) => setQuery(e.target.value)} /><div className="admin-items">{matchingEvents.length ? matchingEvents.map((event) => { const category = categories.find((item) => item.id === event.categoryId); return <article className="admin-item" key={event.id} style={{ '--event-color': category?.color || '#8b9b8d' }}><div className="admin-item-main"><span className="item-category">{category?.name || 'Sem categoria'}</span><h3>{event.title}</h3><p>{fullDate(parseDate(event.startDate))} · {event.allDay ? 'Dia inteiro' : `${event.startTime}–${event.endTime}`}</p><span className={`status ${getStatus(event).tone}`}>{getStatus(event).label}</span></div><div className="item-actions"><button onClick={() => openModal('event', event)}>Editar</button><button className="danger-text" onClick={() => deleteItem('events', event)}>Excluir</button></div></article>; }) : <div className="empty-state">Nenhum evento encontrado.</div>}</div></> : <><p className="section-description">Personalize os tipos de evento e suas cores de identificação.</p><div className="admin-items">{categories.map((category) => <article className="admin-item category-admin-item" key={category.id} style={{ '--event-color': category.color }}><div className="admin-item-main"><h3>{category.name}</h3><p>{events.filter((event) => event.categoryId === category.id).length} evento(s) vinculado(s)</p></div><div className="item-actions"><button onClick={() => openModal('category', category)}>Editar</button><button className="danger-text" onClick={() => deleteItem('categories', category)}>Excluir</button></div></article>)}{!categories.length && <div className="empty-state">Nenhuma categoria cadastrada.</div>}</div><button className="button subtle seed-button" onClick={seedCategories} disabled={busy || initialCategories.every((category) => categories.some((item) => item.name.toLowerCase() === category.name.toLowerCase()))}>Cadastrar categorias iniciais ausentes</button></>}
+            {section === 'admins' ? <AdminManager /> : section === 'profile' ? <ProfileManager /> : section === 'events' ? <>
+              <div className="event-admin-filters">
+                <input className="search-input" placeholder="Pesquisar eventos..." aria-label="Pesquisar eventos" value={query} onChange={(e) => { setQuery(e.target.value); resetPage(); }} />
+                <div className="event-filter-grid">
+                  <label>Categoria<select value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); resetPage(); }}><option value="all">Todas as categorias</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
+                  <label>Status<select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); resetPage(); }}><option value="all">Todos os status</option><option value="scheduled">Agendados</option><option value="ongoing">Em andamento</option><option value="ended">Encerrados</option><option value="completed">Concluídos</option><option value="cancelled">Cancelados</option></select></label>
+                  <label>Data inicial<input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); resetPage(); }} /></label>
+                  <label>Data final<input type="date" min={dateFrom || undefined} value={dateTo} onChange={(e) => { setDateTo(e.target.value); resetPage(); }} /></label>
+                  <label>Ordenar por<select value={eventOrder} onChange={(e) => { setEventOrder(e.target.value); resetPage(); }}><option value="dateAsc">Data — mais próximos primeiro</option><option value="dateDesc">Data — mais distantes primeiro</option><option value="nameAsc">Nome — A a Z</option><option value="nameDesc">Nome — Z a A</option></select></label>
+                  <button type="button" className="event-clear-filters" onClick={() => { setQuery(''); setCategoryFilter('all'); setStatusFilter('all'); setDateFrom(''); setDateTo(''); setEventOrder('dateAsc'); resetPage(); }}>Limpar filtros</button>
+                </div>
+              </div>
+              <div className="event-results-count">{matchingEvents.length} evento(s) encontrado(s)</div>
+              <div className="admin-items">{pagedEvents.length ? pagedEvents.map((event) => { const category = categories.find((item) => item.id === event.categoryId); return <article className="admin-item" key={event.id} style={{ '--event-color': category?.color || '#8b9b8d' }}><div className="admin-item-main"><span className="item-category">{category?.name || 'Sem categoria'}</span><h3>{event.title}</h3><p>{fullDate(parseDate(event.startDate))} · {event.allDay ? 'Dia inteiro' : `${event.startTime}–${event.endTime}`}</p><span className={`status ${getStatus(event).tone}`}>{getStatus(event).label}</span></div><div className="item-actions"><button onClick={() => openModal('event', event)}>Editar</button><button className="danger-text" onClick={() => deleteItem('events', event)}>Excluir</button></div></article>; }) : <div className="empty-state">Nenhum evento encontrado.</div>}</div>
+              {totalPages > 1 && <nav className="event-pagination" aria-label="Paginação de eventos"><button disabled={currentPage === 1} onClick={() => goToPage(currentPage - 1)}>Anterior</button>{visiblePages.map((number, index) => <span className="page-segment" key={number}>{index > 0 && number - visiblePages[index - 1] > 1 && <span className="page-ellipsis">…</span>}<button className={currentPage === number ? 'active' : ''} aria-current={currentPage === number ? 'page' : undefined} onClick={() => goToPage(number)}>{number}</button></span>)}<label className="page-jump">Página <input type="number" min="1" max={totalPages} value={pageInput} onChange={(e) => setPageInput(e.target.value)} onBlur={() => goToPage(pageInput)} onKeyDown={(e) => { if (e.key === 'Enter') { goToPage(pageInput); e.currentTarget.blur(); } }} /></label><button disabled={currentPage === totalPages} onClick={() => goToPage(currentPage + 1)}>Próximo</button></nav>}
+            </> : <><p className="section-description">Personalize os tipos de evento e suas cores de identificação.</p><div className="admin-items">{categories.map((category) => <article className="admin-item category-admin-item" key={category.id} style={{ '--event-color': category.color }}><div className="admin-item-main"><h3>{category.name}</h3><p>{events.filter((event) => event.categoryId === category.id).length} evento(s) vinculado(s)</p></div><div className="item-actions"><button onClick={() => openModal('category', category)}>Editar</button><button className="danger-text" onClick={() => deleteItem('categories', category)}>Excluir</button></div></article>)}{!categories.length && <div className="empty-state">Nenhuma categoria cadastrada.</div>}</div><button className="button subtle seed-button" onClick={seedCategories} disabled={busy || initialCategories.every((category) => categories.some((item) => item.name.toLowerCase() === category.name.toLowerCase()))}>Cadastrar categorias iniciais ausentes</button></>}
           </section>
           <aside className="admin-date-panel"><div className="compact-header"><h3>{monthLabel(month)}</h3><div><button onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} aria-label="Mês anterior">‹</button><button onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} aria-label="Próximo mês">›</button></div></div><div className="mini-calendar">{weekdays.map((day, index) => <span className="mini-weekday" key={index}>{day}</span>)}{cells.map((date) => { const key = dateKey(date); return <button key={key} className={`${date.getMonth() !== month.getMonth() ? 'faded' : ''} ${key === selectedDate ? 'selected' : ''} ${events.some((event) => eventOnDate(event, key)) ? 'has-event' : ''}`} onClick={() => { setSelectedDate(key); setMonth(new Date(date.getFullYear(), date.getMonth(), 1)); }}>{date.getDate()}</button>; })}</div><div className="selected-day-events"><h4>{fullDate(parseDate(selectedDate))}</h4>{selectedEvents.length ? selectedEvents.map((event) => <div key={event.id} className="small-day-event"><strong>{event.title}</strong><small>{event.allDay ? 'Dia inteiro' : event.startTime}</small></div>) : <p>Nenhum evento neste dia.</p>}</div></aside>
         </div>}

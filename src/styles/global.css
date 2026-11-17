@@ -412,3 +412,11 @@ h1, h2, h3, h4, p { margin-top: 0; }
 .category-color-preview{display:flex;align-items:center;gap:7px;padding:9px 10px;border:1px solid #344339;border-radius:8px;background:#101510;font-size:11px;color:#aab9ae}
 .category-color-preview>span{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .category-color-preview strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Ajuste fino: filtros legíveis, com largura discretamente reduzida */
+.event-filter-grid select,.event-filter-grid input{height:36px;min-height:36px;padding:8px 10px;font-size:12px}
+.event-admin-filters .search-input{height:36px;min-height:36px;padding:8px 11px;font-size:12px}
+.event-filter-grid label{font-size:11px;gap:6px}
+.event-clear-filters{height:34px;min-height:34px;padding:7px 12px;font-size:11px}
+.event-filter-grid label>select,.event-filter-grid label>input{width:98%;max-width:100%}
+@media(max-width:540px){.event-filter-grid label>select,.event-filter-grid label>input{width:100%}}

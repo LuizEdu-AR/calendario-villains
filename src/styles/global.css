@@ -314,3 +314,49 @@ h1, h2, h3, h4, p { margin-top: 0; }
 .category-picker-options button:hover{background:#293a2d}
 .category-picker-options button.selected{background:#244630;color:#80e59b}
 .category-picker-empty{padding:10px;color:#a2afa5;font-size:12px}
+
+/* Ajuste fino de densidade visual — 17/11/2026.
+   Reduz apenas espaçamentos, preservando tipografia e altura das células do calendário. */
+.site-header { min-height: 62px; }
+.brand { gap: 12px; }
+.header-nav a, .nav-current { padding: 9px 15px; }
+.toolbar { gap: 12px; margin-bottom: 17px; }
+.segmented button { padding: 8px 16px; }
+.upcoming-strip { padding: 10px 13px; }
+.timezone { padding: 10px 13px; }
+.public-layout { gap: 16px; }
+.sidebar-panel { padding: 15px; }
+.sidebar-stats { gap: 9px; margin-bottom: 18px; }
+.stat-card { padding: 12px 13px; }
+.stat-card strong { font-size: 26px; }
+.sidebar-heading { margin-bottom: 10px; }
+.category-list { gap: 6px; }
+.category-option { padding: 9px 11px; gap: 9px; }
+.category-count { padding: 1px 6px; }
+.calendar-panel { padding: 16px; }
+.calendar-header { margin-bottom: 15px; }
+.list-event { padding: 15px; gap: 18px; }
+.bottom-note { margin-top: 22px; padding: 15px; }
+.site-footer { padding-top: 27px; padding-bottom: 35px; }
+.admin-main { padding-top: 36px; }
+.admin-heading { margin-bottom: 28px; }
+.admin-layout { gap: 15px; }
+.admin-menu, .admin-content, .admin-date-panel { padding: 16px; }
+.admin-menu > button { padding: 11px 12px; margin-bottom: 5px; }
+.admin-items { gap: 8px; }
+.admin-item { padding: 13px 14px; }
+.admin-item h3 { margin: 5px 0; }
+.admin-item p { margin-bottom: 5px; }
+.admin-list-users .admin-item { padding: 12px 14px; }
+.admin-manager-top { margin-bottom: 13px; }
+.admin-manager .admin-list-users { margin: 21px 0; }
+.small-day-event { padding: 8px; margin: 7px 0; }
+.button { padding: 9px 13px; }
+.form-stack input:not([type=checkbox]):not([type=color]), .form-stack textarea, .form-stack select, .search-input { padding: 10px 12px; }
+@media (max-width: 740px) {
+  .site-header { min-height: 58px; }
+  .sidebar-panel { padding: 12px; }
+  .category-option { padding: 8px; gap: 6px; }
+  .calendar-panel { padding: 11px; }
+  .admin-menu, .admin-content, .admin-date-panel { padding: 14px; }
+}

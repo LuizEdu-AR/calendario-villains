@@ -7,7 +7,7 @@ import MonthCalendar from '../components/MonthCalendar';
 import ListCalendar from '../components/ListCalendar';
 import EventModal from '../components/EventModal';
 import { useCalendar } from '../contexts/CalendarContext';
-import { dateKey, eventOnDate, monthLabel, sortEvents } from '../utils/dates';
+import { dateKey, localEventRange, brasiliaInstant, monthLabel, visitorTimeZone } from '../utils/dates';
 
 export default function PublicCalendar() {
   const { events, categories, loading, error } = useCalendar();
@@ -28,12 +28,12 @@ export default function PublicCalendar() {
   const monthlyEvents = useMemo(() => events.filter((event) => {
     const start = dateKey(new Date(month.getFullYear(), month.getMonth(), 1));
     const end = dateKey(new Date(month.getFullYear(), month.getMonth() + 1, 0));
-    return event.startDate <= end && (event.endDate || event.startDate) >= start;
+    return localEventRange(event).start <= end && localEventRange(event).end >= start;
   }), [events, month]);
 
   const filtered = monthlyEvents.filter((event) => visible.includes(event.categoryId));
   const categoryCounts = categories.map((category) => ({ ...category, count: monthlyEvents.filter((event) => event.categoryId === category.id).length }));
-  const upcoming = sortEvents(events.filter((event) => event.startDate >= dateKey(new Date()) && event.status !== 'cancelled'))[0];
+  const upcoming = events.filter((event) => event.status !== 'cancelled' && brasiliaInstant(event.startDate, event.startTime || '00:00') >= now).sort((a, b) => brasiliaInstant(a.startDate, a.startTime || '00:00') - brasiliaInstant(b.startDate, b.startTime || '00:00'))[0];
   const nextCategory = categories.find((category) => category.id === upcoming?.categoryId);
 
   const toggle = (id) => setVisible((previous) => id === null
@@ -46,7 +46,7 @@ export default function PublicCalendar() {
     <div className="app-shell">
       <Header />
       <main className="container public-main">
-        {!loading && !error && <div className="toolbar"><div className="segmented"><button className={view === 'month' ? 'active' : ''} onClick={() => setView('month')}><CalendarDays size={15} /> Mês</button><button className={view === 'list' ? 'active' : ''} onClick={() => setView('list')}><List size={15} /> Lista</button></div><div className="upcoming-strip"><span className="live-dot" />{upcoming ? <><strong>A seguir</strong><span>{upcoming.title}</span><small>{nextCategory?.name || 'Evento'}</small><button onClick={() => setSelected(upcoming)}>Ver detalhes</button></> : <span>Novos eventos serão anunciados aqui.</span>}</div><span className="timezone"><Clock3 size={15} /> Horário de Brasília</span></div>}
+        {!loading && !error && <div className="toolbar"><div className="segmented"><button className={view === 'month' ? 'active' : ''} onClick={() => setView('month')}><CalendarDays size={15} /> Mês</button><button className={view === 'list' ? 'active' : ''} onClick={() => setView('list')}><List size={15} /> Lista</button></div><div className="upcoming-strip"><span className="live-dot" />{upcoming ? <><strong>A seguir</strong><span>{upcoming.title}</span><small>{nextCategory?.name || 'Evento'}</small><button onClick={() => setSelected(upcoming)}>Ver detalhes</button></> : <span>Novos eventos serão anunciados aqui.</span>}</div><span className="timezone"><Clock3 size={15} /> {visitorTimeZone() === 'America/Sao_Paulo' ? 'Horário de Brasília' : 'Horários locais · referência: Brasília'}</span></div>}
         {error && <p className="notice error">{error}</p>}
         {loading ? <div className="calendar-loading" role="status" aria-live="polite"><span className="villains-spinner" aria-hidden="true" /><span>Carregando calendário...</span></div> : error ? <div className="calendar-loading"><p>Não foi possível carregar os dados.</p><button type="button" className="button subtle" onClick={() => window.location.reload()}>Tentar novamente</button></div> : <div className="public-layout"><CategorySidebar categories={categoryCounts} visible={visible} toggle={toggle} eventCount={monthlyEvents.length} /><section className="calendar-panel"><div className="calendar-header"><div className="month-controls"><button onClick={() => changeMonth(-1)} aria-label="Mês anterior">‹</button><button onClick={() => changeMonth(1)} aria-label="Próximo mês">›</button></div><h2>{monthLabel(month)}</h2><button className="text-button today-link" onClick={() => setMonth(new Date())}>Hoje</button></div>{view === 'month' ? <MonthCalendar month={month} events={filtered} categories={categories} onSelect={setSelected} now={now} /> : <ListCalendar month={month} events={filtered} categories={categories} onSelect={setSelected} now={now} />}</section></div>}
         <div className="bottom-note">As datas e horários podem sofrer alterações. Consulte este calendário antes de se programar.</div>

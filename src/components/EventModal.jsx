@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { fullDate, getStatus, parseDate } from '../utils/dates';
+import { fullDate, localEventStatus, parseDate, localEventRange, eventRangeLabel, brasiliaRangeLabel, visitorTimeZone } from '../utils/dates';
 
 function googleCalendarUrl(event) {
   const dateOnly = (value) => value.replaceAll('-', '');
@@ -33,7 +33,8 @@ export default function EventModal({ event, category, onClose }) {
   }, [event, onClose]);
 
   if (!event) return null;
-  const status = getStatus(event);
+  const status = localEventStatus(event);
+  const localRange = localEventRange(event);
 
   return (
     <div className="modal-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
@@ -41,8 +42,9 @@ export default function EventModal({ event, category, onClose }) {
         <button className="close-button" onClick={onClose} aria-label="Fechar">×</button>
         <div className="eyebrow"><span className="category-dot" style={{ background: category?.color }} />{category?.name || 'Sem categoria'}</div>
         <h2>{event.title}</h2>
-        <p className="muted">{fullDate(parseDate(event.startDate))}</p>
-        <p className="muted">{event.allDay ? 'Dia inteiro' : `${event.startTime || '--:--'} às ${event.endTime || '--:--'}`}{event.endDate && event.endDate !== event.startDate ? ` · até ${fullDate(parseDate(event.endDate))}` : ''}</p>
+        <p className="muted">{fullDate(parseDate(localRange.start))}</p>
+        <p className="muted">{eventRangeLabel(event)}{localRange.end !== localRange.start ? ` · até ${fullDate(parseDate(localRange.end))}` : ''}</p>
+        {!event.allDay && visitorTimeZone() !== 'America/Sao_Paulo' && <p className="muted">{brasiliaRangeLabel(event)} · horário oficial</p>}
         <span className={`status ${status.tone}`}>{status.label}</span>
         <p className="event-description">{event.description || 'Sem mais detalhes por enquanto.'}</p>
         <div className="modal-actions">

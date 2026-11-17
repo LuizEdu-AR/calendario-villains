@@ -1,5 +1,5 @@
 import { Toast, ConfirmDialog } from '../components/Feedback';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import FirstAccessModal from '../components/FirstAccessModal';
@@ -21,6 +21,11 @@ export default function AdminPage() {
   const { logout } = useAuth();
   const { events, categories, loading: calendarLoading, error: dataError } = useCalendar();
   const [section, setSection] = useState('events');
+  const [statusClock, setStatusClock] = useState(0);
+  useEffect(() => {
+    const interval = window.setInterval(() => setStatusClock((value) => value + 1), 15_000);
+    return () => window.clearInterval(interval);
+  }, []);
   const [month, setMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(dateKey(new Date()));
   const [query, setQuery] = useState('');
@@ -47,7 +52,7 @@ export default function AdminPage() {
       if (categoryFilter !== 'all' && event.categoryId !== categoryFilter) return false;
       if (statusFilter !== 'all') {
         const status = getStatus(event);
-        const key = event.status === 'cancelled' ? 'cancelled' : status.label === 'Agendado' ? 'scheduled' : status.label === 'Em andamento' ? 'ongoing' : status.label === 'Encerrado' ? 'ended' : status.label === 'Concluído' ? 'completed' : 'other';
+        const key = event.status === 'cancelled' ? 'cancelled' : status.label === 'Agendado' ? 'scheduled' : status.label === 'Em andamento' ? 'ongoing' : status.label === 'Concluído' ? 'completed' : 'other';
         if (key !== statusFilter) return false;
       }
       if (dateFrom && (event.endDate || event.startDate) < dateFrom) return false;
@@ -60,7 +65,7 @@ export default function AdminPage() {
       return eventOrder === 'dateDesc' ? -cmp : cmp;
     });
     return filtered;
-  }, [events, query, categoryFilter, statusFilter, dateFrom, dateTo, eventOrder]);
+  }, [events, query, categoryFilter, statusFilter, dateFrom, dateTo, eventOrder, statusClock]);
   const totalPages = Math.max(1, Math.ceil(matchingEvents.length / EVENTS_PER_PAGE));
   const currentPage = Math.min(page, totalPages);
   const pagedEvents = matchingEvents.slice((currentPage - 1) * EVENTS_PER_PAGE, currentPage * EVENTS_PER_PAGE);
@@ -134,7 +139,7 @@ export default function AdminPage() {
                 <input className="search-input" placeholder="Pesquisar eventos..." aria-label="Pesquisar eventos" value={query} onChange={(e) => { setQuery(e.target.value); resetPage(); }} />
                 <div className="event-filter-grid">
                   <label>Categoria<SelectPicker searchable value={categoryFilter} onChange={(value) => { setCategoryFilter(value); resetPage(); }} options={[{value:'all',label:'Todas as categorias'}, ...categories.map((category) => ({value:category.id,label:category.name,color:category.color}))]} /></label>
-                  <label>Status<SelectPicker value={statusFilter} onChange={(value) => { setStatusFilter(value); resetPage(); }} options={[{value:'all',label:'Todos os status'},{value:'scheduled',label:'Agendados'},{value:'ongoing',label:'Em andamento'},{value:'ended',label:'Encerrados'},{value:'completed',label:'Concluídos'},{value:'cancelled',label:'Cancelados'}]} /></label>
+                  <label>Status<SelectPicker value={statusFilter} onChange={(value) => { setStatusFilter(value); resetPage(); }} options={[{value:'all',label:'Todos os status'},{value:'scheduled',label:'Agendados'},{value:'ongoing',label:'Em andamento'},{value:'completed',label:'Concluídos'},{value:'cancelled',label:'Cancelados'}]} /></label>
                   <label>Data inicial<DatePicker value={dateFrom} onChange={(value) => { setDateFrom(value); if (dateTo && value && dateTo < value) setDateTo(''); resetPage(); }} /></label>
                   <label>Data final<DatePicker min={dateFrom || undefined} value={dateTo} onChange={(value) => { setDateTo(value); resetPage(); }} /></label>
                   <label>Ordenar por<SelectPicker value={eventOrder} onChange={(value) => { setEventOrder(value); resetPage(); }} options={[{value:'dateAsc',label:'Data — mais próximos primeiro'},{value:'dateDesc',label:'Data — mais distantes primeiro'},{value:'nameAsc',label:'Nome — A a Z'},{value:'nameDesc',label:'Nome — Z a A'}]} /></label>

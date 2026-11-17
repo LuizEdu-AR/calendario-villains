@@ -67,7 +67,7 @@ export default function MonthCalendar({ month, events, categories, onSelect, now
             return <button
               key={`${event.id}-${week}`}
               type="button"
-              className={`calendar-multiday ${startsHere ? 'multi-start' : 'multi-continued'} ${endsHere ? 'multi-end' : ''} ${localHasStartedEarlier(event, now) ? 'event-past' : ''}`}
+              className={`calendar-multiday ${startsHere ? 'multi-start' : 'multi-continued'} ${endsHere ? 'multi-end' : ''} ${endsHere && localHasStartedEarlier(event, now) ? 'event-past' : ''}`}
               style={{ '--span-start': start, '--span-days': end - start + 1, '--multi-lane': lane, '--event-color': category?.color || '#8b9b8d' }}
               title={`${event.title} · ${eventRangeLabel(event)}`}
               aria-label={`${event.title}, ${eventRangeLabel(event)}`}

@@ -44,25 +44,25 @@ export function getStatus(event) {
   if (event.status === 'cancelled') return { label: 'Cancelado', tone: 'danger' };
   if (event.status === 'completed') return { label: 'Concluído', tone: 'success' };
   const now = new Date();
-  const end = new Date(`${event.endDate || event.startDate}T${event.allDay ? '23:59' : event.endTime || '23:59'}:00`);
-  const start = new Date(`${event.startDate}T${event.allDay ? '00:00' : event.startTime || '00:00'}:00`);
-  if (now > end) return { label: 'Encerrado', tone: 'muted' };
+  const end = brasiliaInstant(event.endDate || event.startDate, event.allDay ? '23:59' : event.endTime || '23:59');
+  const start = brasiliaInstant(event.startDate, event.allDay ? '00:00' : event.startTime || '00:00');
+  if (!start || !end) return { label: 'Agendado', tone: 'neutral' };
+  if (now > end) return { label: 'Concluído', tone: 'success' };
   if (now >= start) return { label: 'Em andamento', tone: 'success' };
   return { label: 'Agendado', tone: 'neutral' };
 }
 
-// O risco aparece a partir do minuto seguinte ao início programado.
-// Eventos de dia inteiro só são considerados passados no dia seguinte.
+// Um evento só é considerado passado depois do término oficial, nunca após o início.
 export function hasStartedEarlier(event, now = new Date()) {
-  if (!event.startDate) return false;
-  if (event.allDay) {
-    return dateKey(now) > (event.endDate || event.startDate);
-  }
-  if (!/^\d{2}:\d{2}$/.test(event.startTime || '')) return false;
-  const start = new Date(`${event.startDate}T${event.startTime}:00`);
-  return !Number.isNaN(start.getTime()) && now.getTime() >= start.getTime() + 60_000;
+  return isEventFinished(event, now);
 }
 
+export function isEventFinished(event, now = new Date()) {
+  if (!event || event.status === 'cancelled') return false;
+  if (event.status === 'completed') return true;
+  const end = brasiliaInstant(event.endDate || event.startDate, event.allDay ? '23:59' : event.endTime || '23:59');
+  return Boolean(end && now.getTime() > end.getTime());
+}
 
 // Eventos são cadastrados no horário civil de Brasília, independentemente do navegador.
 export const EVENT_TIME_ZONE = 'America/Sao_Paulo';
@@ -153,12 +153,11 @@ export function localEventStatus(event, now = new Date()) {
   const start = brasiliaInstant(event.startDate, event.allDay ? '00:00' : event.startTime || '00:00');
   const end = brasiliaInstant(event.endDate || event.startDate, event.allDay ? '23:59' : event.endTime || '23:59');
   if (!start || !end) return { label: 'Agendado', tone: 'neutral' };
-  if (now > end) return { label: 'Encerrado', tone: 'muted' };
+  if (now > end) return { label: 'Concluído', tone: 'success' };
   if (now >= start) return { label: 'Em andamento', tone: 'success' };
   return { label: 'Agendado', tone: 'neutral' };
 }
 
 export function localHasStartedEarlier(event, now = new Date()) {
-  const start = brasiliaInstant(event.startDate, event.allDay ? '00:00' : event.startTime || '00:00');
-  return Boolean(start && now.getTime() >= start.getTime() + 60_000);
+  return isEventFinished(event, now);
 }

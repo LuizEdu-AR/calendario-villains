@@ -420,3 +420,26 @@ h1, h2, h3, h4, p { margin-top: 0; }
 .event-clear-filters{height:34px;min-height:34px;padding:7px 12px;font-size:11px}
 .event-filter-grid label>select,.event-filter-grid label>input{width:98%;max-width:100%}
 @media(max-width:540px){.event-filter-grid label>select,.event-filter-grid label>input{width:100%}}
+
+/* Gradiente de tonalidade: sobrepoe o fundo padrao dos inputs do formulario. */
+.category-color-editor .category-hue-label input[type="range"] {
+  background: linear-gradient(to right, #ff0000 0%, #ffff00 16.666%, #00ff00 33.333%, #00ffff 50%, #0000ff 66.666%, #ff00ff 83.333%, #ff0000 100%) !important;
+  background-image: linear-gradient(to right, #ff0000 0%, #ffff00 16.666%, #00ff00 33.333%, #00ffff 50%, #0000ff 66.666%, #ff00ff 83.333%, #ff0000 100%) !important;
+  background-color: transparent !important;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 13px;
+  padding: 0;
+  border: 1px solid #35463a;
+  border-radius: 999px;
+}
+.category-color-editor .category-hue-label input[type="range"]::-webkit-slider-runnable-track {
+  height: 11px;
+  background: transparent !important;
+  border-radius: 999px;
+}
+.category-color-editor .category-hue-label input[type="range"]::-moz-range-track {
+  height: 11px;
+  background: transparent !important;
+  border-radius: 999px;
+}

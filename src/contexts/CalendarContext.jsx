@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { firebaseConfigured } from '../services/firebase';
 import { initialCategories, subscribeCollection } from '../services/calendarService';
+import { sortCategories } from '../utils/categories';
 
 const CalendarContext = createContext(null);
 
@@ -31,7 +32,7 @@ export function CalendarProvider({ children }) {
     }, fail);
 
     const stopCategories = subscribeCollection('categories', (items) => {
-      setCategories(items);
+      setCategories(sortCategories(items));
       categoryReady = true;
       ready();
     }, fail);
@@ -43,7 +44,7 @@ export function CalendarProvider({ children }) {
   }, []);
 
   return (
-    <CalendarContext.Provider value={{ events, categories, error, loading, initialCategories }}>
+    <CalendarContext.Provider value={{ events, categories, error, loading, initialCategories: sortCategories(initialCategories) }}>
       {children}
     </CalendarContext.Provider>
   );

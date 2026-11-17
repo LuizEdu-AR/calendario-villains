@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { fullDate, localEventStatus, parseDate, localEventRange, eventRangeLabel, brasiliaRangeLabel, visitorTimeZone } from '../utils/dates';
+import { fullDate, localEventStatus, parseDate, localEventRange, eventRangeLabel, brasiliaRangeLabel, usesBrasiliaTimeForEvent } from '../utils/dates';
 
 function googleCalendarUrl(event) {
   const dateOnly = (value) => value.replaceAll('-', '');
@@ -44,7 +44,7 @@ export default function EventModal({ event, category, onClose }) {
         <h2>{event.title}</h2>
         <p className="muted">{fullDate(parseDate(localRange.start))}</p>
         <p className="muted">{eventRangeLabel(event)}{localRange.end !== localRange.start ? ` · até ${fullDate(parseDate(localRange.end))}` : ''}</p>
-        {!event.allDay && visitorTimeZone() !== 'America/Sao_Paulo' && <p className="muted">{brasiliaRangeLabel(event)} · horário oficial</p>}
+        {!event.allDay && !usesBrasiliaTimeForEvent(event) && <p className="muted">{brasiliaRangeLabel(event)} · horário oficial</p>}
         <span className={`status ${status.tone}`}>{status.label}</span>
         <p className="event-description">{event.description || 'Sem mais detalhes por enquanto.'}</p>
         <div className="modal-actions">

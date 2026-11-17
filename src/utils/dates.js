@@ -68,6 +68,31 @@ export function hasStartedEarlier(event, now = new Date()) {
 export const EVENT_TIME_ZONE = 'America/Sao_Paulo';
 export const visitorTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone || EVENT_TIME_ZONE;
 
+// Compara o horário civil, não o identificador do fuso: regiões como
+// Fortaleza também usam UTC-3 e não precisam de uma linha duplicada.
+export function usesBrasiliaTimeForEvent(event) {
+  if (!event || event.allDay) return true;
+  const formatter = (timeZone) => new Intl.DateTimeFormat('en-GB', {
+    timeZone, year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  });
+  const local = formatter(visitorTimeZone());
+  const brasilia = formatter(EVENT_TIME_ZONE);
+  const starts = brasiliaInstant(event.startDate, event.startTime || '00:00');
+  const ends = brasiliaInstant(event.endDate || event.startDate, event.endTime || '23:59');
+  return [starts, ends].every((instant) => instant && local.format(instant) === brasilia.format(instant));
+}
+
+export function usesBrasiliaTimeNow() {
+  const instant = new Date();
+  const format = (timeZone) => new Intl.DateTimeFormat('en-GB', {
+    timeZone, year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).format(instant);
+  return format(visitorTimeZone()) === format(EVENT_TIME_ZONE);
+}
+
+
 export function brasiliaInstant(date, time = '00:00') {
   if (!date) return null;
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);

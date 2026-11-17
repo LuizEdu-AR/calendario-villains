@@ -136,7 +136,7 @@ export default function AdminPage() {
                   <label>Data inicial<input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); resetPage(); }} /></label>
                   <label>Data final<input type="date" min={dateFrom || undefined} value={dateTo} onChange={(e) => { setDateTo(e.target.value); resetPage(); }} /></label>
                   <label>Ordenar por<select value={eventOrder} onChange={(e) => { setEventOrder(e.target.value); resetPage(); }}><option value="dateAsc">Data — mais próximos primeiro</option><option value="dateDesc">Data — mais distantes primeiro</option><option value="nameAsc">Nome — A a Z</option><option value="nameDesc">Nome — Z a A</option></select></label>
-                  <button type="button" className="event-clear-filters" onClick={() => { setQuery(''); setCategoryFilter('all'); setStatusFilter('all'); setDateFrom(''); setDateTo(''); setEventOrder('dateAsc'); resetPage(); }}>Limpar filtros</button>
+                  <div className="event-clear-wrap"><button type="button" className="event-clear-filters" onClick={() => { setQuery(''); setCategoryFilter('all'); setStatusFilter('all'); setDateFrom(''); setDateTo(''); setEventOrder('dateAsc'); resetPage(); }}>Limpar filtros</button></div>
                 </div>
               </div>
               <div className="event-results-count">{matchingEvents.length} evento(s) encontrado(s)</div>

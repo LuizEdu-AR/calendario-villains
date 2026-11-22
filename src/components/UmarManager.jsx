@@ -22,7 +22,6 @@ export default function UmarManager({ mode }) {
   const [error,setError] = useState('');
   const [success,setSuccess] = useState('');
   const [search,setSearch] = useState('');
-  const [filterDay,setFilterDay] = useState('all');
   useEffect(() => {
     const subs = ['umarMembers','umarWeeks','umarAttendance'].map((name,i) => subscribeCollection(name, rows => {
       const setter = [setMembers,setWeeks,setAttendance][i];
@@ -32,7 +31,7 @@ export default function UmarManager({ mode }) {
     return () => subs.forEach(unsub => unsub());
   },[]);
   const ordered = useMemo(() => [...members].sort(sortMembers),[members]);
-  const shown = useMemo(() => ordered.filter(m => `${m.name} ${m.memberId} ${m.course}`.toLocaleLowerCase('pt-BR').includes(search.toLocaleLowerCase('pt-BR')) && (filterDay==='all' || String(m.day)===filterDay)),[ordered,search,filterDay]);
+  const shown = useMemo(() => ordered.filter(m => `${m.name} ${m.memberId} ${m.course}`.toLocaleLowerCase('pt-BR').includes(search.toLocaleLowerCase('pt-BR'))),[ordered,search]);
   const orderedWeeks = useMemo(() => [...weeks].sort((a,b) => a.number-b.number),[weeks]);
   const entryFor = (memberId,weekId) => attendance.find(a => a.memberRef===memberId && a.weekRef===weekId);
   async function run(fn,message) {
@@ -77,7 +76,7 @@ export default function UmarManager({ mode }) {
       <div className="umar-member-list">{shown.map(m=><article className="umar-member" key={m.id}><div><strong>{m.name}</strong><small>ID {m.memberId} · {m.course}</small><small>{DAYS[Number(m.day)]} · {m.time}</small></div><div className="item-actions"><button onClick={()=>{setEditing(m);setForm({name:m.name,memberId:m.memberId,course:m.course,day:String(m.day),time:m.time});}}>Editar</button><button className="danger-text" onClick={()=>setDeleting(m)}>Excluir</button></div></article>)}{!shown.length&&<p className="empty-state">Nenhum membro encontrado.</p>}</div>
     </> : <>
       <div className="umar-toolbar"><p className="section-description">Registre a presença dos alunos em cada semana.</p><button className="button primary" disabled={busy} onClick={addWeek}>+ Adicionar semana</button></div>
-      <div className="umar-filters"><input className="search-input" placeholder="Pesquisar membro..." value={search} onChange={e=>setSearch(e.target.value)}/><SelectPicker value={filterDay} onChange={setFilterDay} options={[{value:'all',label:'Todos os dias'},...DAYS.map((day,i)=>({value:String(i),label:day}))]}/></div>
+      <div className="umar-filters"><input className="search-input" placeholder="Pesquisar membro..." value={search} onChange={e=>setSearch(e.target.value)}/></div>
       <div className="umar-table-scroll"><table className="umar-table"><thead><tr><th>Membro</th>{orderedWeeks.map(w=><th key={w.id}>Semana {w.number}</th>)}</tr></thead><tbody>{shown.map(m=><tr key={m.id}><td><strong>{m.name}</strong><small>{DAYS[Number(m.day)]} · {m.time}</small></td>{orderedWeeks.map(w=>{const a=entryFor(m.id,w.id);return <td key={w.id}><button className={`umar-attendance ${a?.status||'pending'}`} aria-label={`Registrar frequência de ${m.name} na semana ${w.number}`} title={a?.justification||'Registrar frequência'} onClick={()=>{setChoice({member:m,week:w,stage:'select'});setReason(a?.justification||'');}}>{a?.status==='present'?'✓':a?.status==='absent'?'×':'−'}</button></td>;})}</tr>)}</tbody></table>{!shown.length&&<p className="empty-state">Nenhum membro encontrado.</p>}</div>
       <div className="umar-legend"><span>✓ Presente</span><span>× Ausente</span><span>− Não registrado</span></div>
     </>}

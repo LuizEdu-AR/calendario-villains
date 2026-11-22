@@ -581,3 +581,15 @@ h1, h2, h3, h4, p { margin-top: 0; }
 .umar-status-absent { color: #ffa0a0; background: #412323; border: 1px solid #814242; }
 @media (max-width: 1100px) { .admin-shell .admin-layout { grid-template-columns: 180px minmax(0,1fr); } .admin-shell .admin-date-panel { grid-column: 2; } }
 @media (max-width: 740px) { .admin-shell .admin-layout { grid-template-columns: minmax(0,1fr); } .admin-shell .admin-menu { min-height: 0; } .admin-shell .admin-menu-footer { display: none; } .admin-shell .admin-date-panel { grid-column: auto; } .umar-toolbar { flex-wrap: wrap; } .umar-toolbar .search-input { flex-basis: 100%; } .umar-filters { grid-template-columns: 1fr; } }
+
+/* UMAR: only the attendance table uses the space reserved for the mini calendar. */
+.admin-shell .admin-layout-attendance > .admin-content { grid-column: 2 / 4; }
+.admin-shell .umar-filters { display: block; }
+.admin-shell .umar-filters > .search-input { display: block; width: 100%; box-sizing: border-box; }
+
+/* Sidebar section labels are non-interactive dividers, not navigation entries. */
+.admin-shell .admin-menu-group:not(:first-child) { border-top: 1px solid #2a352d; padding-top: 15px; }
+.admin-shell .admin-menu .menu-label { color: #88aa91; font-weight: 800; letter-spacing: .17em; font-size: 10px; cursor: default; user-select: none; }
+.admin-shell .admin-menu-group > button:hover:not(.selected) { background: #202a22; color: #e0ede1; }
+@media (max-width: 1100px) { .admin-shell .admin-layout-attendance > .admin-content { grid-column: 2; } }
+@media (max-width: 740px) { .admin-shell .admin-layout-attendance > .admin-content { grid-column: 1; } }

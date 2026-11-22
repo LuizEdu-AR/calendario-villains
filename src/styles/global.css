@@ -537,11 +537,9 @@ h1, h2, h3, h4, p { margin-top: 0; }
 .editor-modal,.event-modal{scrollbar-width:none;-ms-overflow-style:none}
 .editor-modal::-webkit-scrollbar,.event-modal::-webkit-scrollbar{display:none;width:0;height:0}
 
-/* Painel administrativo: navegação lateral fixa */
-.admin-shell { --umar-sidebar-width: 232px; }
-.admin-shell .admin-main { width: auto; max-width: none; margin-left: var(--umar-sidebar-width); padding-left: 26px; padding-right: 26px; }
-.admin-shell .admin-layout { grid-template-columns: minmax(0,1fr) 260px; }
-.admin-shell .admin-menu { position: fixed; left: 0; top: 0; bottom: 0; z-index: 80; width: var(--umar-sidebar-width); min-height: 0; border-radius: 0; border-top: 0; border-bottom: 0; border-left: 0; padding: 26px 13px 18px; display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; }
+/* Painel administrativo: menu em card na coluna esquerda, como no layout original */
+.admin-shell .admin-layout { grid-template-columns: 210px minmax(0,1fr) 260px; }
+.admin-shell .admin-menu { position: static; width: auto; min-height: 520px; border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; overflow: visible; }
 .admin-shell .admin-menu::-webkit-scrollbar { display: none; }
 .admin-shell .admin-menu-group { margin-bottom: 17px; }
 .admin-shell .admin-menu .menu-label { margin: 0 0 7px 10px; font-size: 10px; }
@@ -549,7 +547,6 @@ h1, h2, h3, h4, p { margin-top: 0; }
 .admin-shell .admin-menu-group > button.selected { background: #213c28; color: #85e299; }
 .admin-shell .admin-menu-footer { margin-top: auto; padding: 16px 10px 0; }
 .admin-menu-logout { display: block; margin-top: 16px; background: transparent; border: 0; color: #b3beb2; font-size: 11px; cursor: pointer; padding: 4px 0; }
-.admin-shell .site-header, .admin-shell .villains-footer { margin-left: var(--umar-sidebar-width); }
 .admin-shell .admin-content { min-width: 0; }
 .admin-mobile-menu-toggle { display: none; }
 .umar-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
@@ -582,5 +579,5 @@ h1, h2, h3, h4, p { margin-top: 0; }
 .umar-status-options button { border-radius: 10px; padding: 15px 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
 .umar-status-present { color: #8ce6a2; background: #183b25; border: 1px solid #317b48; }
 .umar-status-absent { color: #ffa0a0; background: #412323; border: 1px solid #814242; }
-@media (max-width: 1100px) { .admin-shell .admin-layout { grid-template-columns: minmax(0,1fr); } .admin-shell .admin-date-panel { grid-column: auto; } }
-@media (max-width: 740px) { .admin-shell { --umar-sidebar-width: 0px; } .admin-shell .admin-main, .admin-shell .site-header, .admin-shell .villains-footer { margin-left: 0; } .admin-shell .admin-main { padding-left: 16px; padding-right: 16px; } .admin-shell .admin-menu { width: 235px; transform: translateX(-100%); transition: transform .2s; box-shadow: 0 0 35px #0008; } .admin-shell .admin-menu.menu-open { transform: translateX(0); } .admin-mobile-menu-toggle { display: inline-flex; margin-bottom: 14px; } .umar-toolbar { flex-wrap: wrap; } .umar-toolbar .search-input { flex-basis: 100%; } .umar-filters { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) { .admin-shell .admin-layout { grid-template-columns: 180px minmax(0,1fr); } .admin-shell .admin-date-panel { grid-column: 2; } }
+@media (max-width: 740px) { .admin-shell .admin-layout { grid-template-columns: minmax(0,1fr); } .admin-shell .admin-menu { min-height: 0; } .admin-shell .admin-menu-footer { display: none; } .admin-shell .admin-date-panel { grid-column: auto; } .umar-toolbar { flex-wrap: wrap; } .umar-toolbar .search-input { flex-basis: 100%; } .umar-filters { grid-template-columns: 1fr; } }

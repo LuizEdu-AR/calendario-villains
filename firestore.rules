@@ -25,6 +25,17 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // Frequência UMAR: leitura e escrita exclusivas para administradores.
+    match /umarMembers/{memberId} {
+      allow read, write: if isAdmin();
+    }
+    match /umarWeeks/{weekId} {
+      allow read, write: if isAdmin();
+    }
+    match /umarAttendance/{attendanceId} {
+      allow read, write: if isAdmin();
+    }
+
     // Dados dos administradores
     match /admins/{adminId} {
       allow get: if isSignedIn()

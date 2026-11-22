@@ -593,3 +593,15 @@ h1, h2, h3, h4, p { margin-top: 0; }
 .admin-shell .admin-menu-group > button:hover:not(.selected) { background: #202a22; color: #e0ede1; }
 @media (max-width: 1100px) { .admin-shell .admin-layout-attendance > .admin-content { grid-column: 2; } }
 @media (max-width: 740px) { .admin-shell .admin-layout-attendance > .admin-content { grid-column: 1; } }
+
+/* Gerenciar Membros: pesquisa e ação na mesma linha e altura. */
+.umar-toolbar > .search-input,
+.umar-toolbar > .button.primary {
+  box-sizing: border-box;
+  height: 38px;
+  min-height: 38px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.umar-toolbar > .search-input { padding-top: 8px; padding-bottom: 8px; }
+.umar-toolbar > .button.primary { flex-shrink: 0; white-space: nowrap; }
